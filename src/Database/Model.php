@@ -7,8 +7,11 @@ use Nece\Framework\Adapter\Contract\DataBase\IModel;
 
 class Model extends EloquentModel implements IModel
 {
+
+    const DELETED_AT = 'deleted_time';
+
     // 指定使用的查询类
-    protected $query = Query::class;
+    protected static string $builder = Query::class;
 
     /**
      * 开始事务
@@ -60,5 +63,12 @@ class Model extends EloquentModel implements IModel
     public function getTableName(): string
     {
         return $this->table;
+    }
+
+    public static function alias(string $alias)
+    {
+        $model = new static();
+        $model->from($model->getTable(), $alias);
+        return $model->query();
     }
 }

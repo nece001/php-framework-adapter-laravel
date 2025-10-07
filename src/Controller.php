@@ -54,8 +54,8 @@ abstract class Controller extends BaseController implements IController
      */
     public function getPagingVar()
     {
-        $page = $this->getRequest()->param($this->page_var_name, 1);
-        $page_size = $this->getRequest()->param($this->page_size_var_name, 20);
+        $page = $this->param($this->page_var_name, 1);
+        $page_size = $this->param($this->page_size_var_name, 20);
 
         return new PagingVar($page, $page_size, $this->page_var_name, $this->page_size_var_name);
     }

@@ -22,7 +22,7 @@ class Db implements IDbManater
      * @param string $as 别名
      * @return QueryBuilder
      */
-    public function table($table, $as = null)
+    public static function table($table, $as = null)
     {
         return FacadesDB::table($table, $as);
     }
@@ -33,7 +33,7 @@ class Db implements IDbManater
      * @param  mixed  $value
      * @return Expression
      */
-    public function raw($value)
+    public static function raw($value)
     {
         return FacadesDB::raw($value);
     }
@@ -46,7 +46,7 @@ class Db implements IDbManater
      * @param  bool  $useReadPdo
      * @return mixed
      */
-    public function selectOne($query, $bindings = [], $useReadPdo = true)
+    public static function selectOne($query, $bindings = [], $useReadPdo = true)
     {
         return FacadesDB::selectOne($query, $bindings, $useReadPdo);
     }
@@ -61,7 +61,7 @@ class Db implements IDbManater
      *
      * @throws RuntimeException
      */
-    public function scalar($query, $bindings = [], $useReadPdo = true)
+    public static function scalar($query, $bindings = [], $useReadPdo = true)
     {
         return FacadesDB::scalar($query, $bindings, $useReadPdo);
     }
@@ -74,7 +74,7 @@ class Db implements IDbManater
      * @param  bool  $useReadPdo
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true)
+    public static function select($query, $bindings = [], $useReadPdo = true)
     {
         return FacadesDB::select($query, $bindings, $useReadPdo);
     }
@@ -87,7 +87,7 @@ class Db implements IDbManater
      * @param  bool  $useReadPdo
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true)
+    public static function cursor($query, $bindings = [], $useReadPdo = true)
     {
         return FacadesDB::cursor($query, $bindings, $useReadPdo);
     }
@@ -99,7 +99,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return bool
      */
-    public function insert($query, $bindings = [])
+    public static function insert($query, $bindings = [])
     {
         return FacadesDB::insert($query, $bindings);
     }
@@ -111,7 +111,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return int
      */
-    public function update($query, $bindings = [])
+    public static function update($query, $bindings = [])
     {
         return FacadesDB::update($query, $bindings);
     }
@@ -123,7 +123,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return int
      */
-    public function delete($query, $bindings = [])
+    public static function delete($query, $bindings = [])
     {
         return FacadesDB::delete($query, $bindings);
     }
@@ -135,7 +135,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return bool
      */
-    public function statement($query, $bindings = [])
+    public static function statement($query, $bindings = [])
     {
         return FacadesDB::statement($query, $bindings);
     }
@@ -147,7 +147,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return int
      */
-    public function affectingStatement($query, $bindings = [])
+    public static function affectingStatement($query, $bindings = [])
     {
         return FacadesDB::affectingStatement($query, $bindings);
     }
@@ -158,7 +158,7 @@ class Db implements IDbManater
      * @param  string  $query
      * @return bool
      */
-    public function unprepared($query)
+    public static function unprepared($query)
     {
         return FacadesDB::unprepared($query);
     }
@@ -169,7 +169,7 @@ class Db implements IDbManater
      * @param  array  $bindings
      * @return array
      */
-    public function prepareBindings(array $bindings)
+    public static function prepareBindings(array $bindings)
     {
         return FacadesDB::prepareBindings($bindings);
     }
@@ -183,7 +183,7 @@ class Db implements IDbManater
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public static function transaction(Closure $callback, $attempts = 1)
     {
         return FacadesDB::transaction($callback, $attempts);
     }
@@ -193,7 +193,7 @@ class Db implements IDbManater
      *
      * @return void
      */
-    public function beginTransaction()
+    public static function beginTransaction()
     {
         FacadesDB::beginTransaction();
     }
@@ -203,7 +203,7 @@ class Db implements IDbManater
      *
      * @return void
      */
-    public function commit()
+    public static function commit()
     {
         FacadesDB::commit();
     }
@@ -213,7 +213,7 @@ class Db implements IDbManater
      *
      * @return void
      */
-    public function rollBack()
+    public static function rollBack()
     {
         FacadesDB::rollBack();
     }
@@ -223,7 +223,7 @@ class Db implements IDbManater
      *
      * @return int
      */
-    public function transactionLevel()
+    public static function transactionLevel()
     {
         return FacadesDB::transactionLevel();
     }
@@ -234,7 +234,7 @@ class Db implements IDbManater
      * @param  \Closure  $callback
      * @return array
      */
-    public function pretend(Closure $callback)
+    public static function pretend(Closure $callback)
     {
         return FacadesDB::pretend($callback);
     }
@@ -244,7 +244,7 @@ class Db implements IDbManater
      *
      * @return string
      */
-    public function getDatabaseName()
+    public static function getDatabaseName()
     {
         return FacadesDB::getDatabaseName();
     }
