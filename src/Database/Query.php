@@ -7,7 +7,6 @@ use Nece\Gears\Dto;
 use Nece\Gears\PagingCollection;
 use Nece\Gears\PagingVar;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class Query extends Builder implements IQuery
 {
@@ -45,19 +44,6 @@ class Query extends Builder implements IQuery
     public function group(...$groups)
     {
         $this->query->groupBy(...$groups);
-        return $this;
-    }
-
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
-    {
-        if (is_array($table)) {
-            $tmp = '';
-            foreach ($table as $t => $a) {
-                $tmp = $t . ' as ' . $a;
-            }
-            $table = $tmp;
-        }
-        $this->query->join($table, $first, $operator, $second);
         return $this;
     }
 

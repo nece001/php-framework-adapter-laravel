@@ -5,6 +5,7 @@ namespace Nece\Framework\Adapter\Database;
 use Closure;
 use Illuminate\Support\Facades\DB as FacadesDB;
 use Nece\Framework\Adapter\Contract\DataBase\IDbManater;
+use Illuminate\Database\Query\Builder;
 
 /**
  * @see \Illuminate\Database\DatabaseManager
@@ -20,7 +21,7 @@ class Db implements IDbManater
      *
      * @param string $table 表名
      * @param string $as 别名
-     * @return QueryBuilder
+     * @return Builder
      */
     public static function table($table, $as = null)
     {
@@ -36,6 +37,100 @@ class Db implements IDbManater
     public static function raw($value)
     {
         return FacadesDB::raw($value);
+    }
+
+    /**
+     * 原始函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:04:25
+     *
+     * @param string $func 函数名
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawFunc(string $func, string $field, string $alias)
+    {
+        if (false !== strpos($field, '.')) {
+            $field = FacadesDB::getTablePrefix() . $field;
+        }
+        return self::raw($func . '(' . $field . ') as ' . $alias);
+    }
+
+    /**
+     * 计数函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:04:43
+     *
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawCount(string $field, string $alias)
+    {
+        return self::rawFunc('COUNT', $field, $alias);
+    }
+
+    /**
+     * 求和函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:04:52
+     *
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawSum(string $field, string $alias)
+    {
+        return self::rawFunc('SUM', $field, $alias);
+    }
+
+    /**
+     * 平均值函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:05:01
+     *
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawAvg(string $field, string $alias)
+    {
+        return self::rawFunc('AVG', $field, $alias);
+    }
+
+    /**
+     * 最小值函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:05:10
+     *
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawMin(string $field, string $alias)
+    {
+        return self::rawFunc('MIN', $field, $alias);
+    }
+
+    /**
+     * 最大值函数表达式
+     *
+     * @author nece001@163.com
+     * @create 2025-10-07 23:05:19
+     *
+     * @param string $field 字段名
+     * @param string $alias 别名
+     * @return Expression
+     */
+    public static function rawMax(string $field, string $alias)
+    {
+        return self::rawFunc('MAX', $field, $alias);
     }
 
     /**
@@ -247,5 +342,10 @@ class Db implements IDbManater
     public static function getDatabaseName()
     {
         return FacadesDB::getDatabaseName();
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        return FacadesDB::$name(...$arguments);
     }
 }
