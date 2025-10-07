@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller as BaseController;
 use Nece\Framework\Adapter\Contract\IController;
 use Nece\Framework\Adapter\Response as AdapterResponse;
 use Nece\Gears\PagingVar;
-use think\Request;
-use think\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * 控制器基类

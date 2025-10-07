@@ -3,12 +3,12 @@
 namespace Nece\Framework\Adapter\Database;
 
 use Closure;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Nece\Framework\Adapter\Contract\DataBase\IDbManater;
-use think\facade\Db as FacadeDb;
 
 /**
- * @see \think\DbManager
- * @mixin \think\DbManager
+ * @see \Illuminate\Database\DatabaseManager
+ * @mixin \Illuminate\Database\DatabaseManager
  */
 class Db implements IDbManater
 {
@@ -24,7 +24,7 @@ class Db implements IDbManater
      */
     public function table($table, $as = null)
     {
-        return FacadeDb::table($table, $as);
+        return FacadesDB::table($table, $as);
     }
 
     /**
@@ -35,7 +35,7 @@ class Db implements IDbManater
      */
     public function raw($value)
     {
-        return FacadeDb::raw($value);
+        return FacadesDB::raw($value);
     }
 
     /**
@@ -48,7 +48,7 @@ class Db implements IDbManater
      */
     public function selectOne($query, $bindings = [], $useReadPdo = true)
     {
-        return FacadeDb::selectOne($query, $bindings, $useReadPdo);
+        return FacadesDB::selectOne($query, $bindings, $useReadPdo);
     }
 
     /**
@@ -63,7 +63,7 @@ class Db implements IDbManater
      */
     public function scalar($query, $bindings = [], $useReadPdo = true)
     {
-        return FacadeDb::scalar($query, $bindings, $useReadPdo);
+        return FacadesDB::scalar($query, $bindings, $useReadPdo);
     }
 
     /**
@@ -76,7 +76,7 @@ class Db implements IDbManater
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return FacadeDb::select($query, $bindings, $useReadPdo);
+        return FacadesDB::select($query, $bindings, $useReadPdo);
     }
 
     /**
@@ -89,7 +89,7 @@ class Db implements IDbManater
      */
     public function cursor($query, $bindings = [], $useReadPdo = true)
     {
-        return FacadeDb::cursor($query, $bindings, $useReadPdo);
+        return FacadesDB::cursor($query, $bindings, $useReadPdo);
     }
 
     /**
@@ -101,7 +101,7 @@ class Db implements IDbManater
      */
     public function insert($query, $bindings = [])
     {
-        return FacadeDb::insert($query, $bindings);
+        return FacadesDB::insert($query, $bindings);
     }
 
     /**
@@ -113,7 +113,7 @@ class Db implements IDbManater
      */
     public function update($query, $bindings = [])
     {
-        return FacadeDb::update($query, $bindings);
+        return FacadesDB::update($query, $bindings);
     }
 
     /**
@@ -125,7 +125,7 @@ class Db implements IDbManater
      */
     public function delete($query, $bindings = [])
     {
-        return FacadeDb::delete($query, $bindings);
+        return FacadesDB::delete($query, $bindings);
     }
 
     /**
@@ -137,7 +137,7 @@ class Db implements IDbManater
      */
     public function statement($query, $bindings = [])
     {
-        return FacadeDb::statement($query, $bindings);
+        return FacadesDB::statement($query, $bindings);
     }
 
     /**
@@ -149,7 +149,7 @@ class Db implements IDbManater
      */
     public function affectingStatement($query, $bindings = [])
     {
-        return FacadeDb::affectingStatement($query, $bindings);
+        return FacadesDB::affectingStatement($query, $bindings);
     }
 
     /**
@@ -160,7 +160,7 @@ class Db implements IDbManater
      */
     public function unprepared($query)
     {
-        return FacadeDb::unprepared($query);
+        return FacadesDB::unprepared($query);
     }
 
     /**
@@ -171,7 +171,7 @@ class Db implements IDbManater
      */
     public function prepareBindings(array $bindings)
     {
-        return FacadeDb::prepareBindings($bindings);
+        return FacadesDB::prepareBindings($bindings);
     }
 
     /**
@@ -185,7 +185,7 @@ class Db implements IDbManater
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
-        return FacadeDb::transaction($callback, $attempts);
+        return FacadesDB::transaction($callback, $attempts);
     }
 
     /**
@@ -195,7 +195,7 @@ class Db implements IDbManater
      */
     public function beginTransaction()
     {
-        FacadeDb::beginTransaction();
+        FacadesDB::beginTransaction();
     }
 
     /**
@@ -205,7 +205,7 @@ class Db implements IDbManater
      */
     public function commit()
     {
-        FacadeDb::commit();
+        FacadesDB::commit();
     }
 
     /**
@@ -215,7 +215,7 @@ class Db implements IDbManater
      */
     public function rollBack()
     {
-        FacadeDb::rollBack();
+        FacadesDB::rollBack();
     }
 
     /**
@@ -225,7 +225,7 @@ class Db implements IDbManater
      */
     public function transactionLevel()
     {
-        return FacadeDb::transactionLevel();
+        return FacadesDB::transactionLevel();
     }
 
     /**
@@ -236,7 +236,7 @@ class Db implements IDbManater
      */
     public function pretend(Closure $callback)
     {
-        return FacadeDb::pretend($callback);
+        return FacadesDB::pretend($callback);
     }
 
     /**
@@ -246,6 +246,6 @@ class Db implements IDbManater
      */
     public function getDatabaseName()
     {
-        return FacadeDb::getDatabaseName();
+        return FacadesDB::getDatabaseName();
     }
 }
