@@ -1,0 +1,23 @@
+{
+    "name": "nece001/php-framework-adapter-laravel",
+    "description": "php laravel框架适配",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nece\\Framework\\Adapter\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nece001",
+            "email": "nece001@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "extra": {
+        
+    }
+}
