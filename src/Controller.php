@@ -71,9 +71,9 @@ abstract class Controller extends BaseController implements IController
      * @param string|array|null $filter 过滤函数
      * @return mixed
      */
-    public function param($name = '', $default = null, string|array|null $filter = null)
+    public function param($name = null, $default = null, string|array|null $filter = null)
     {
-        return $this->getRequest()->request($name, $default, $filter);
+        return $this->getRequest()->input($name, $default, $filter);
     }
 
     /**

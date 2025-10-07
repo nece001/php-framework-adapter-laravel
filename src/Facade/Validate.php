@@ -4,24 +4,22 @@ namespace Nece\Framework\Adapter\Facade;
 
 use Illuminate\Support\Facades\Validator;
 use Nece\Framework\Adapter\Contract\Facade\IValidate;
-use Nece\Framework\Adapter\Exception\Contract\ValidateException;
+use Nece\Framework\Adapter\Contract\Exception\ValidateException;
 
 class Validate implements IValidate
 {
     /**
      * @inheritDoc
      */
-    public static function validate(array $data, array $validate, array $message = [], bool $batch = false): void
+    public static function validate(array $data, array $validate, array $message = [], $attribute = [], bool $batch = false): void
     {
-        $validator = Validator::make($validate)->message($message)->batch($batch);
-        if (!$validator->check($data)) {
-            $error = $validator->getError();
-            $message = $error;
-            if (is_array($error)) {
-                $message = implode(';', $error);
+        $validator = Validator::make($data, $validate, $message, $attribute);
+        if ($validator->fails()) {
+            if ($batch) {
+                throw new ValidateException($validator->errors()->first());
+            } else {
+                throw new ValidateException(implode(', ', $validator->errors()->all()));
             }
-
-            throw new ValidateException($message, 'value_validate_fail');
         }
     }
 }
