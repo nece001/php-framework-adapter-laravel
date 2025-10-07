@@ -8,6 +8,8 @@ use Nece\Framework\Adapter\Contract\DataBase\IModel;
 
 class Model extends EloquentModel implements IModel
 {
+    const CREATED_AT = 'created_time';
+    const UPDATED_AT = 'updated_time';
     const DELETED_AT = 'deleted_time';
 
     // 指定使用的查询类
