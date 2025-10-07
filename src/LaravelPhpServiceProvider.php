@@ -2,6 +2,7 @@
 
 namespace Nece\Framework\Adapter;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Route;
 use Nece\Framework\Adapter\Middleware\RequestIsJson;
 
@@ -17,7 +18,11 @@ class LaravelPhpServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // $this->app->middleware->add(RequestIsJson::class);
+        // 获取 HTTP 内核实例
+        $kernel = $this->app->make(Kernel::class);
+        
+        // 注册全局中间件
+        $kernel->pushMiddleware(RequestIsJson::class);
 
         Route::macro('pattern', function(){});
     }

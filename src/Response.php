@@ -2,7 +2,6 @@
 
 namespace Nece\Framework\Adapter;
 
-use Illuminate\Support\Facades\View;
 use Nece\Framework\Adapter\Facade\Session;
 use Nece\Gears\ResponseData;
 use Throwable;
@@ -29,7 +28,7 @@ class Response
             $data = ResponseData::success($data);
             return json($data, $data['http_status']);
         } else {
-            return View::fetch($template, $data);
+            return view($template, $data);
         }
     }
 
