@@ -5,7 +5,6 @@ namespace Nece\Framework\Adapter\Facade;
 use Illuminate\Support\Facades\Route as FacadesRoute;
 use Nece\Framework\Adapter\Contract\Facade\IRoute;
 
-
 /**
  * 路由门面
  *
@@ -123,7 +122,7 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function group(string $name, $routes)
     {
-        return parent::group($name, $routes);
+        return parent::group(['prefix' => $name], $routes);
     }
 
     /**
@@ -164,6 +163,6 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array(['think\\facade\\Route', $name], $arguments);
+        return call_user_func_array(['Illuminate\Support\Facades\Route', $name], $arguments);
     }
 }
