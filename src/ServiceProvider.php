@@ -17,12 +17,12 @@ abstract class ServiceProvider extends SupportServiceProvider implements IServic
     /**
      * @inheritDoc
      */
-    abstract public function register();
+    public function register() {}
 
     /**
      * @inheritDoc
      */
-    abstract public function boot();
+    public function boot() {}
 
     /**
      * @inheritDoc
