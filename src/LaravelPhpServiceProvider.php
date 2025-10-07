@@ -2,6 +2,7 @@
 
 namespace Nece\Framework\Adapter;
 
+use Illuminate\Routing\Route;
 use Nece\Framework\Adapter\Middleware\RequestIsJson;
 
 class LaravelPhpServiceProvider extends ServiceProvider
@@ -17,6 +18,8 @@ class LaravelPhpServiceProvider extends ServiceProvider
     public function register()
     {
         // $this->app->middleware->add(RequestIsJson::class);
+
+        Route::macro('pattern', function(){});
     }
 
     public function boot() {}
