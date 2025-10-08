@@ -128,10 +128,10 @@ class Route implements IRoute
      * @param  \Closure|string  $routes
      * @return Group
      */
-    public static function group(string $name, $routes)
+    public static function group(string $name, $routes, array $middleware = [])
     {
         $name = self::fixRule($name);
-        return FacadesRoute::group(['prefix' => $name], $routes);
+        return FacadesRoute::group(['prefix' => $name, 'middleware' => $middleware], $routes);
     }
 
     /**

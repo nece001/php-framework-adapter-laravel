@@ -44,6 +44,6 @@ class Session implements ISession
      */
     public static function delete(string $key): void
     {
-        FacadesSession::delete($key);
+        FacadesSession::remove($key);
     }
 }

@@ -13,6 +13,17 @@ class Validate implements IValidate
      */
     public static function validate(array $data, array $validate, array $message = [], $attribute = [], bool $batch = false): void
     {
+        $validate = array_map(function ($item) {
+            $parts = array_map(function ($part) {
+                if ($part == 'require') {
+                    return 'required';
+                }
+                return $part;
+            }, explode('|', $item));
+
+            return implode('|', $parts);
+        }, $validate);
+
         $validator = Validator::make($data, $validate, $message, $attribute);
         if ($validator->fails()) {
             if ($batch) {
