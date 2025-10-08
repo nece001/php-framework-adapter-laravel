@@ -20,7 +20,7 @@ class Session implements ISession
      */
     public static function set(string $key, $value): void
     {
-        FacadesSession::set($key, $value);
+        FacadesSession::put($key, $value);
     }
 
     /**
