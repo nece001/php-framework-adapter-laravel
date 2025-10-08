@@ -11,10 +11,10 @@ use Nece\Framework\Adapter\Contract\Facade\IRoute;
  * @author nece001@163.com
  * @create 2025-10-06 22:57:00
  * 
- * @implement Route<\think\route\RuleItem>
- * @implement Group<\think\route\RuleGroup>
+ * @implement Route<\Illuminate\Routing\Route>
+ * @implement Group<\Illuminate\Routing\Route>
  */
-class Route extends FacadesRoute implements IRoute
+class Route implements IRoute
 {
     /**
      * 注册一个新的GET路由到路由器
@@ -25,7 +25,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function get($uri, $action)
     {
-        return parent::get($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::get($uri, $action);
     }
 
     /**
@@ -37,7 +38,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function post($uri, $action)
     {
-        return parent::post($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::post($uri, $action);
     }
 
     /**
@@ -49,7 +51,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function put($uri, $action)
     {
-        return parent::put($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::put($uri, $action);
     }
 
     /**
@@ -61,7 +64,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function delete($uri, $action)
     {
-        return parent::delete($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::delete($uri, $action);
     }
 
     /**
@@ -73,7 +77,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function patch($uri, $action)
     {
-        return parent::patch($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::patch($uri, $action);
     }
 
     /**
@@ -85,7 +90,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function options($uri, $action)
     {
-        return parent::options($uri, $action);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::options($uri, $action);
     }
 
     /**
@@ -97,7 +103,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function any($uri, $route)
     {
-        return parent::any($uri, $route);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::any($uri, $route);
     }
 
     /**
@@ -110,7 +117,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function resource($name, $controller, array $options = [])
     {
-        return parent::resource($name, $controller, $options);
+        $name = self::fixRule($name);
+        return FacadesRoute::resource($name, $controller, $options);
     }
 
     /**
@@ -122,7 +130,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function group(string $name, $routes)
     {
-        return parent::group(['prefix' => $name], $routes);
+        $name = self::fixRule($name);
+        return FacadesRoute::group(['prefix' => $name], $routes);
     }
 
     /**
@@ -135,7 +144,7 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function url(string $name, array $parameters = [], bool $absolute = true): string
     {
-        return parent::buildUrl($name, $parameters, $absolute);
+        return route($name, $parameters, $absolute);
     }
 
     /**
@@ -143,7 +152,8 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function match($methods, $uri, $action)
     {
-        return self::rule($uri, $action, $methods);
+        $uri = self::fixRule($uri);
+        return FacadesRoute::any($uri, $action, $methods);
     }
 
     /**
@@ -151,6 +161,9 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function fixRule(string $rule): string
     {
+        $rule = preg_replace('/\[:([^\/]+)\]/', '{$1?}', $rule);
+        $rule = preg_replace('/<([^\/]+)>/', '{$1}', $rule);
+        $rule = preg_replace('/:([^\/]+)/', '{$1}', $rule);
         return $rule;
     }
 
@@ -163,6 +176,6 @@ class Route extends FacadesRoute implements IRoute
      */
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array(['Illuminate\Support\Facades\Route', $name], $arguments);
+        return call_user_func_array([FacadesRoute::class, $name], $arguments);
     }
 }

@@ -80,20 +80,4 @@ class Model extends EloquentModel implements IModel
     {
         return $this->table ?? Str::snake(class_basename($this));
     }
-
-    /**
-     * 别名
-     *
-     * @author nece001@163.com
-     * @create 2025-10-07 15:13:40
-     *
-     * @param string $alias
-     * @return Query
-     */
-    public static function alias(string $alias)
-    {
-        $model = new static();
-        $model->from($model->getTable(), $alias);
-        return $model->query();
-    }
 }

@@ -8,6 +8,14 @@ use Nece\Gears\PagingCollection;
 use Nece\Gears\PagingVar;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * 查询类
+ *
+ * @author nece001@163.com
+ * @create 2025-10-08 10:09:19
+ * 
+ * @see Illuminate\Database\Eloquent\Builder
+ */
 class Query extends Builder implements IQuery
 {
     private $alias = '';
@@ -22,7 +30,7 @@ class Query extends Builder implements IQuery
         return $this->alias;
     }
 
-    public function field($columns = [])
+    public function field($columns = ['*']): self
     {
         $this->query->select($columns);
         return $this;
@@ -81,10 +89,10 @@ class Query extends Builder implements IQuery
      *
      * @return array
      */
-    public function all(): array
+    public function fetch(): array
     {
         $list = array();
-        $items = $this->select();
+        $items = $this->get();
         if ($items) {
             foreach ($items as $item) {
                 $list[] = new Dto($item->toArray());
