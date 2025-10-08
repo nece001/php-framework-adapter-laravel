@@ -8,9 +8,18 @@ use Nece\Framework\Adapter\Contract\DataBase\IModel;
 
 class Model extends EloquentModel implements IModel
 {
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-    const DELETED_AT = 'deleted_time';
+    const CREATED_AT = 'create_time';
+    const UPDATED_AT = 'update_time';
+    const DELETED_AT = 'delete_time';
+
+    /**
+     * 表别名
+     *
+     * @var string
+     */
+    protected $alias = '';
+
+    protected $field = [];
 
     // 指定使用的查询类
     protected static string $builder = Query::class;
@@ -79,5 +88,53 @@ class Model extends EloquentModel implements IModel
     public function getTable()
     {
         return $this->table ?? Str::snake(class_basename($this));
+    }
+
+    /**
+     * 查询表
+     *
+     * @author nece001@163.com
+     * @create 2025-10-08 11:34:30
+     *
+     * @param string $table
+     * @param string $alias
+     * @return self
+     */
+    public function from(string $table, string $alias = '')
+    {
+        $this->alias = $alias;
+        return parent::from($table, $alias);
+    }
+
+    /**
+     * 获取表别名
+     *
+     * @author nece001@163.com
+     * @create 2025-10-08 11:34:30
+     *
+     * @return string
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * 填充字段数据
+     *
+     * @author nece001@163.com
+     * @create 2025-10-08 11:44:13
+     *
+     * @param array $data
+     * @return self
+     */
+    public function fillData(array $data): self
+    {
+        foreach ($this->field as $field) {
+            if (isset($data[$field])) {
+                $this->$field = $data[$field];
+            }
+        }
+        return $this;
     }
 }
