@@ -21,9 +21,6 @@ class Model extends EloquentModel implements IModel
 
     protected $field = [];
 
-    // 指定使用的查询类
-    protected static string $builder = Query::class;
-
     /**
      * 开始事务
      *
