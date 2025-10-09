@@ -238,7 +238,7 @@ class Query implements IQuery
     public function fetch(): array
     {
         $list = array();
-        $items = $this->query->select();
+        $items = $this->query->get();
         if ($items) {
             foreach ($items as $row) {
                 $list[] = new Dto((array)$row);
