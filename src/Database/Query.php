@@ -147,7 +147,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function groupByRaw(string $group): self
+    public function groupRaw(string $group): self
     {
         $this->query->groupByRaw($group);
         return $this;
