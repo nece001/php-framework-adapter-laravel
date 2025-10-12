@@ -132,4 +132,28 @@ class Db implements IDbManater
     {
         return self::rawFunc('MAX', $field, $alias);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function startTrans()
+    {
+        FacadesDB::beginTransaction();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function commit()
+    {
+        FacadesDB::commit();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function rollback()
+    {
+        FacadesDB::rollback();
+    }
 }
