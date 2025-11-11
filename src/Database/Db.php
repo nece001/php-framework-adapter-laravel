@@ -14,21 +14,6 @@ use Nece\Framework\Adapter\Contract\DataBase\IQuery;
 class Db implements IDbManater
 {
     /**
-     * 获取查询构建器
-     *
-     * @author nece001@163.com
-     * @create 2025-10-05 11:28:24
-     *
-     * @param string $table 表名
-     * @param string $alias 别名
-     * @return Builder
-     */
-    public static function table($table, $alias = ''): IQuery
-    {
-        return new Query($table, $alias);
-    }
-
-    /**
      * 原始表达式
      *
      * @param  mixed  $value
@@ -155,5 +140,21 @@ class Db implements IDbManater
     public static function rollback()
     {
         FacadesDB::rollback();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function transaction(callable $callback)
+    {
+        return FacadesDB::transaction($callback);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function execute(string $sql)
+    {
+        return FacadesDB::execute($sql);
     }
 }

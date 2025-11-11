@@ -3,9 +3,8 @@
 namespace Nece\Framework\Adapter\Database;
 
 use Closure;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 use Nece\Framework\Adapter\Contract\DataBase\IQuery;
-use Nece\Gears\Dto;
 use Nece\Gears\PagingCollection;
 use Nece\Gears\PagingVar;
 
@@ -15,14 +14,14 @@ use Nece\Gears\PagingVar;
  * @author nece001@163.com
  * @create 2025-10-08 10:09:19
  * 
- * @see Illuminate\Database\Query\Builder
+ * @see Illuminate\Database\Eloquent\Builder
  */
 class Query implements IQuery
 {
     /**
      * 数据库查询对象
      *
-     * @var \Illuminate\Database\Query\Builder
+     * @var \Illuminate\Database\Eloquent\Builder
      */
     private $query;
 
@@ -33,12 +32,26 @@ class Query implements IQuery
      */
     private $alias = '';
 
-    public function __construct(string $table, string $alias = '')
+    public function __construct(Builder $builder)
     {
-        $this->query = DB::table($table, $alias);
-        if ($alias) {
-            $this->alias = $alias;
+        $this->query = $builder;
+    }
+
+    public function __call($name, $arguments)
+    {
+        $result = $this->query->$name(...$arguments);
+        if ($result instanceof Builder) {
+            return $this;
         }
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     /**
@@ -52,16 +65,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function distinct(bool $distinct = true): self
-    {
-        $this->query->distinct($distinct);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function field(string|array $field): self
+    public function field($field): self
     {
         $this->query->select($field);
         return $this;
@@ -70,7 +74,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function join(string|array $table, Closure $on, string $type = 'INNER'): self
+    public function join($table, Closure $on, string $type = 'INNER'): self
     {
         if (is_array($table)) {
             $key = array_key_first($table);
@@ -84,7 +88,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function leftJoin(string|array $table, Closure $on): self
+    public function leftJoin($table, Closure $on): self
     {
         $this->join($table, $on, 'LEFT');
         return $this;
@@ -93,7 +97,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function rightJoin(string|array $table, Closure $on): self
+    public function rightJoin($table, Closure $on): self
     {
         $this->join($table, $on, 'RIGHT');
         return $this;
@@ -102,7 +106,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function fullJoin(string|array $table, Closure $on): self
+    public function fullJoin($table, Closure $on): self
     {
         $this->join($table, $on, 'FULL');
         return $this;
@@ -111,7 +115,7 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function crossJoin(string|array $table, Closure $on): self
+    public function crossJoin($table, Closure $on): self
     {
         $this->join($table, $on, 'CROSS');
         return $this;
@@ -120,108 +124,19 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function where($field, $op = null, $condition = null): self
+    public function order($field, string $order = 'asc'): self
     {
-        $this->query->where($field, $op, $condition);
+        $this->query->orderBy($field, $order);
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function order(string $field, string $direction = 'asc'): self
-    {
-        $this->query->orderBy($field, $direction);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function group(string $field): self
+    public function group($field): self
     {
         $this->query->groupBy($field);
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function groupRaw(string $group): self
-    {
-        $this->query->groupByRaw($group);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function having(string $field, string $operator, $value): self
-    {
-        $this->query->having($field, $operator, $value);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function page(int $page, int $limit): self
-    {
-        $this->query->forPage($page, $limit);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function limit(int $limit): self
-    {
-        $this->query->limit($limit);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function lock(bool $lock = true): self
-    {
-        $this->query->lock($lock);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function comment(string $comment): self
-    {
-        $this->query->comment($comment);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function union(Closure $closure): self
-    {
-        $this->query->union($closure);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function partition(string $partition): self
-    {
-        $this->query->partition($partition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function value(string $field, $default = null)
-    {
-        return $this->query->value($field, $default);
     }
 
     /**
@@ -235,13 +150,13 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function fetch(): array
+    public function select(): array
     {
         $list = array();
         $items = $this->query->get();
         if ($items) {
             foreach ($items as $row) {
-                $list[] = new Dto((array)$row);
+                $list[] = $row;
             }
         }
         return $list;
@@ -262,7 +177,7 @@ class Query implements IQuery
             $list->setCurrentPage($items->currentPage());
 
             foreach ($items as $row) {
-                $list->add(new Dto((array)$row));
+                $list->add($row);
             }
         }
 
@@ -283,248 +198,5 @@ class Query implements IQuery
     public function toSql(): string
     {
         return $this->query->buildSql();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOr($field, $op = null, $condition = null): self
-    {
-        $this->query->orWhere($field, $op, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereXor($field, $op = null, $condition = null): self
-    {
-        $this->query->whereXor($field, $op, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNull(string $field, string $logic = 'AND'): self
-    {
-        $this->query->whereNull($field, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNotNull(string $field, string $logic = 'AND'): self
-    {
-        $this->query->whereNotNull($field, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrNull(string $field): self
-    {
-        $this->query->orWhereNull($field);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrNotNull(string $field): self
-    {
-        $this->query->orWhereNotNull($field);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereExists($condition, string $logic = 'AND'): self
-    {
-        $this->query->whereExists($condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNotExists($condition, string $logic = 'AND'): self
-    {
-        $this->query->whereNotExists($condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereIn(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereIn($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrIn(string $field, $condition): self
-    {
-        $this->query->orWhereIn($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNotIn(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereNotIn($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrNotIn(string $field, $condition): self
-    {
-        $this->query->orWhereNotIn($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereLike(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereLike($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrLike(string $field, $condition): self
-    {
-        $this->query->orWhereLike($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNotLike(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereNotLike($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrNotLike(string $field, $condition): self
-    {
-        $this->query->orWhereNotLike($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereBetween(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereBetween($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereNotBetween(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereNotBetween($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrBetween(string $field, $condition): self
-    {
-        $this->query->orWhereBetween($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrNotBetween(string $field, $condition): self
-    {
-        $this->query->orWhereNotBetween($field, $condition);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereJsonContains(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->whereJsonContains($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrJsonContains(string $field, $condition, string $logic = 'AND'): self
-    {
-        $this->query->orWhereJsonContains($field, $condition, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereColumn(string $field1, string $operator, ?string $field2 = null, string $logic = 'AND'): self
-    {
-        $this->query->whereColumn($field1, $operator, $field2, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrColumn(string $field1, string $operator, ?string $field2 = null): self
-    {
-        $this->query->orWhereColumn($field1, $operator, $field2);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereRaw(string $where, array $bind = [], string $logic = 'AND'): self
-    {
-        $this->query->whereRaw($where, $bind, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function whereOrRaw(string $where, array $bind = [], string $logic = 'AND'): self
-    {
-        $this->query->orWhereRaw($where, $bind, $logic);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function when($condition, Closure | array $query, Closure | array | null $otherwise = null): self
-    {
-        $this->query->when($condition, $query, $otherwise);
-        return $this;
     }
 }
