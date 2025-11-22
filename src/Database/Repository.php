@@ -3,10 +3,11 @@
 namespace Nece\Framework\Adapter\Database;
 
 use Illuminate\Support\Facades\DB;
+use Nece\Framework\Adapter\Contract\DataBase\DbRepository;
+use Nece\Framework\Adapter\Contract\DataBase\IModel;
 use Nece\Framework\Adapter\Contract\DataBase\IQuery;
-use Nece\Framework\Adapter\Contract\DataBase\IRepository;
 
-abstract class Repository implements IRepository
+abstract class Repository extends DbRepository
 {
     /**
      * @inheritDoc
@@ -43,53 +44,10 @@ abstract class Repository implements IRepository
     /**
      * @inheritDoc
      */
-    public function createModel(): Model
+    public function createModel(): IModel
     {
         $class = $this->getModelName();
         return new $class();
-    }
-
-    public function find(array $where)
-    {
-        $model = $this->getModelName()::where($where)->select();
-        if (!$model) {
-            return null;
-        }
-        return $this->getEntityName()::buildFromData($model->toArray());
-    }
-
-    public function findById($id)
-    {
-        $model = $this->query()->find($id);
-        if (!$model) {
-            return null;
-        }
-        return $this->getEntityName()::buildFromData($model->toArray());
-    }
-
-    public function delete($entity)
-    {
-        $model_name = $this->getModelName();
-        $model_name::destroy($entity->getId());
-        $entity->emitEvents();
-    }
-
-    public function save($entity): void
-    {
-        $id = $entity->getId();
-        $model = null;
-        $query = $this->query();
-        if ($id) {
-            $model = $query->find($id);
-        }
-        if (!$model) {
-            $model = $this->createModel();
-        }
-
-        $model->fill($entity->toSaveArray());
-        $model->save();
-        $entity->setId($model->id);
-        $entity->emitEvents();
     }
 
     /**
@@ -104,5 +62,71 @@ abstract class Repository implements IRepository
         }
 
         return new Query($query);
+    }
+
+    /**
+     * 加载实体（填充聚合根数据）
+     *
+     * @author nece001@163.com
+     * @create 2025-11-22 20:49:10
+     *
+     * @param AggregateRoot $aggregateRoot
+     * @return IModel
+     */
+    protected function loadEntity($aggregateRoot): IModel
+    {
+        $model = $this->getModelName()::find($aggregateRoot->getId());
+        if ($model) {
+            $aggregateRoot->updateData($model->toArray());
+        }
+
+        return $model;
+    }
+
+    /**
+     * 保存聚合根（创建或更新）
+     *
+     * @author nece001@163.com
+     * @create 2025-11-22 20:50:00
+     *
+     * @param AggregateRoot $aggregateRoot
+     * @return IModel
+     */
+    protected function saveEntity($aggregateRoot): IModel
+    {
+        $model = $this->getModelName()::find($aggregateRoot->getId());
+        if (!$model) {
+            $model = $this->createModel();
+        }
+
+        $data = $aggregateRoot->toArray();
+        foreach ($data as $key => $value) {
+            if (!in_array($key, [$model->getKeyName(), $model->getCreatedAtColumn(), $model->getUpdatedAtColumn(), $model->getDeletedAtColumn()])) {
+                $model->$key = $value;
+            }
+        }
+        $model->save();
+
+        $aggregateRoot->setId($model->{$model->getKeyName()});
+
+        return $model;
+    }
+
+    /**
+     * 删除聚合根（根据聚合根ID）
+     *
+     * @author nece001@163.com
+     * @create 2025-11-22 20:50:39
+     *
+     * @param AggregateRoot $aggregateRoot
+     * @return IModel
+     */
+    protected function deleteEntity($aggregateRoot): IModel
+    {
+        $model = $this->getModelName()::find($aggregateRoot->getId());
+        if ($model) {
+            $model->delete();
+        }
+        return $model;
     }
 }

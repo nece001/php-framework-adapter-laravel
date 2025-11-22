@@ -2,6 +2,7 @@
 
 namespace Nece\Framework\Adapter\Database;
 
+use DateTimeInterface;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Nece\Framework\Adapter\Contract\DataBase\IModel;
@@ -20,34 +21,12 @@ class Model extends EloquentModel implements IModel
     const UPDATED_AT = 'update_time';
     const DELETED_AT = 'delete_time';
 
-    public static function booted()
-    {
-        static::initGlobalScopes();
-    }
-
-    protected static function globalScopes()
-    {
-        return [];
-    }
-
-    protected static function initGlobalScopes()
-    {
-        foreach (static::globalScopes() as $scope) {
-            $scope_name = 'scope' . ucfirst($scope);
-            static::addGlobalScope($scope_name, function ($builder) use ($scope_name) {
-                $builder->getModel()->$scope_name($builder);
-            });
-        }
-    }
-
     /**
      * 表别名
      *
      * @var string
      */
     protected $alias = '';
-
-    protected $field = [];
 
     /**
      * 开始事务
@@ -131,21 +110,16 @@ class Model extends EloquentModel implements IModel
     }
 
     /**
-     * 填充字段数据
+     * 日期格式格式化
      *
      * @author nece001@163.com
-     * @create 2025-10-08 11:44:13
+     * @create 2025-11-22 21:09:22
      *
-     * @param array $data
-     * @return self
+     * @param DateTimeInterface $date
+     * @return string
      */
-    public function fill(array $data): self
+    protected function serializeDate(DateTimeInterface $date)
     {
-        foreach ($this->field as $field) {
-            if (isset($data[$field])) {
-                $this->$field = $data[$field];
-            }
-        }
-        return $this;
+        return $date->format('Y-m-d H:i:s');
     }
 }
