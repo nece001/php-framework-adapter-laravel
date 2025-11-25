@@ -192,23 +192,26 @@ class Query implements IQuery
     /**
      * @inheritDoc
      */
-    public function paginate(PagingVar $paging): PagingCollection
+    public function paginate(int $page, int $size): array
     {
-        $page = $paging->getPage();
-        $size = $paging->getPageSize();
+        $data = array(
+            'page' => $page,
+            'size' => $size,
+            'total' => 0,
+            'items' => []
+        );
 
-        $list = new PagingCollection([], 0, $page, $size, $paging->getPageVarName(), $paging->getPageSizeVarName());
-        $items = $this->query->paginate($size, ['*'], $paging->getPageVarName(), $page);
+        $items = $this->query->paginate($size, ['*'], '', $page);
         if ($items) {
-            $list->setTotal($items->total());
-            $list->setCurrentPage($items->currentPage());
+            $data['total'] = $items->total();
+            $data['current_page'] = $items->currentPage();
 
             foreach ($items as $row) {
-                $list->add($row);
+                $data['items'][] = $row;
             }
         }
 
-        return $list;
+        return $data;
     }
 
     /**
