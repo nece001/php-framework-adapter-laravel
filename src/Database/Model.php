@@ -160,4 +160,18 @@ class Model extends EloquentModel implements IModel
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    /**
+     * 从查询获取别名
+     *
+     * @author nece001@163.com
+     * @create 2025-11-25 13:46:43
+     *
+     * @param Builder $query
+     * @return string
+     */
+    protected function getAliasFromQuery($query)
+    {
+        return $this->getAlias();
+    }
 }
