@@ -22,6 +22,44 @@ class Model extends EloquentModel implements IModel
     const DELETED_AT = 'delete_time';
 
     /**
+     * 本模型的全局查询范围
+     *
+     * @var array
+     */
+    protected static $model_global_scopes = [];
+
+    /**
+     * 初始本模型的全局查询范围
+     *
+     * @author nece001@163.com
+     * @create 2025-11-25 13:25:24
+     *
+     * @return void
+     */
+    protected static function initGlobalScopes()
+    {
+        foreach (static::$model_global_scopes as $scope) {
+            $scope_name = 'scope' . ucfirst($scope);
+            static::addGlobalScope($scope_name, function ($builder) use ($scope_name) {
+                $builder->getModel()->$scope_name($builder);
+            });
+        }
+    }
+
+    /**
+     * 模型启动完事件，子类要调用此方法，否则无法注册全局查询范围
+     *
+     * @author nece001@163.com
+     * @create 2025-11-25 13:25:39
+     *
+     * @return void
+     */
+    public static function booted()
+    {
+        static::initGlobalScopes();
+    }
+
+    /**
      * 表别名
      *
      * @var string

@@ -32,11 +32,29 @@ class Query implements IQuery
      */
     private $alias = '';
 
+    /**
+     * 构造方法
+     *
+     * @author nece001@163.com
+     * @create 2025-11-25 13:21:32
+     *
+     * @param Builder $builder Laravel的数据库查询对象
+     */
     public function __construct(Builder $builder)
     {
         $this->query = $builder;
     }
 
+    /**
+     * 默认调用原查询方法
+     *
+     * @author nece001@163.com
+     * @create 2025-11-25 13:21:00
+     *
+     * @param string $name
+     * @param mixed $arguments
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
         $result = $this->query->$name(...$arguments);
@@ -68,6 +86,15 @@ class Query implements IQuery
     public function field($field): self
     {
         $this->query->select($field);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function alias($alias): self
+    {
+        $this->query->from($this->query->getModel()->getTable(), $alias);
         return $this;
     }
 
@@ -197,6 +224,6 @@ class Query implements IQuery
      */
     public function toSql(): string
     {
-        return $this->query->buildSql();
+        return $this->query->toSql();
     }
 }
