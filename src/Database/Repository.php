@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Nece\Framework\Adapter\Contract\DataBase\DbRepository;
 use Nece\Framework\Adapter\Contract\DataBase\IModel;
 use Nece\Framework\Adapter\Contract\DataBase\IQuery;
+use Nece\Framework\Adapter\Contract\DataBase\IRepository;
 
-abstract class Repository extends DbRepository
+abstract class Repository extends DbRepository implements IRepository
 {
     /**
      * @inheritDoc
