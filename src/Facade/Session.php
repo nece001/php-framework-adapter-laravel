@@ -2,10 +2,10 @@
 
 namespace Nece\Framework\Adapter\Facade;
 
-use Illuminate\Support\Facades\Session as FacadesSession;
+use Illuminate\Support\Facades\Session as LaravelSession;
 use Nece\Framework\Adapter\Contract\Facade\Session as ContractFacadeSession;
 
-class Session extends FacadesSession implements ContractFacadeSession
+class Session implements ContractFacadeSession
 {
     /**
      * 销毁会话
@@ -14,7 +14,7 @@ class Session extends FacadesSession implements ContractFacadeSession
      */
     public static function destroy(): void
     {
-        static::invalidate();
+        LaravelSession::invalidate();
     }
 
     /**
@@ -26,18 +26,7 @@ class Session extends FacadesSession implements ContractFacadeSession
      */
     public static function set(string $key, $value): void
     {
-        static::put($key, $value);
-    }
-
-    /**
-     * 删除会话属性
-     *
-     * @param string $key 属性键名
-     * @return void
-     */
-    public static function delete(string $key): void
-    {
-        static::forget($key);
+        LaravelSession::put($key, $value);
     }
 
     /**
@@ -49,7 +38,18 @@ class Session extends FacadesSession implements ContractFacadeSession
      */
     public static function get(string $key, $default = null)
     {
-        return static::get($key, $default);
+        return LaravelSession::get($key, $default);
+    }
+
+    /**
+     * 删除会话属性
+     *
+     * @param string $key 属性键名
+     * @return void
+     */
+    public static function delete(string $key): void
+    {
+        LaravelSession::forget($key);
     }
 
     /**
@@ -60,6 +60,6 @@ class Session extends FacadesSession implements ContractFacadeSession
      */
     public static function has(string $key): bool
     {
-        return static::has($key);
+        return LaravelSession::has($key);
     }
 }
