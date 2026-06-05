@@ -6,8 +6,9 @@ use Nece\Framework\Adapter\Contract\Controller as ContractController;
 use Nece\Framework\Adapter\Request;
 use Nece\Framework\Adapter\Facade\Response as FacadeResponse;
 use Nece\Framework\Adapter\Facade\Session as FacadeSession;
+use Illuminate\Routing\Controller as IlluminateController;
 
-class Controller implements ContractController
+class Controller extends IlluminateController implements ContractController
 {
     /**
      * @var Request
@@ -18,6 +19,15 @@ class Controller implements ContractController
      * @var array
      */
     private $cookies = [];
+
+    public function __construct()
+    {
+        // 初始化中间件，兼容其它框架的写法
+        $middleware = $this->middleware ?? [];
+        $this->middleware = [];
+
+        $this->middleware($middleware);
+    }
 
     /**
      * 获取当前请求

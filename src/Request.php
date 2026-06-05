@@ -553,4 +553,9 @@ class Request implements ContractRequest
 
         return $value;
     }
+
+    public function __get($name)
+    {
+        return $this->request->$name;
+    }
 }
