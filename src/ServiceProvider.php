@@ -17,12 +17,18 @@ abstract class ServiceProvider extends IlluminateServiceProvider implements Cont
     /**
      * @inheritDoc
      */
-    abstract public function register();
+    public function register()
+    {
+        // 默认实现，子类可以覆盖
+    }
 
     /**
      * @inheritDoc
      */
-    abstract public function boot();
+    public function boot()
+    {
+        // 默认实现，子类可以覆盖
+    }
 
     /**
      * @inheritDoc
