@@ -145,7 +145,7 @@ class Controller implements ContractController
      */
     public function setSession(string $name, $value)
     {
-        FacadeSession::put($name, $value);
+        FacadeSession::set($name, $value);
         return $this;
     }
 
@@ -157,7 +157,7 @@ class Controller implements ContractController
      */
     public function deleteSession(string $name)
     {
-        FacadeSession::forget($name);
+        FacadeSession::delete($name);
         return $this;
     }
 

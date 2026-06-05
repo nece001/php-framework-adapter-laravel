@@ -62,4 +62,27 @@ class Session implements ContractFacadeSession
     {
         return LaravelSession::has($key);
     }
+
+    /**
+     * 设置会话属性（Laravel 风格）
+     *
+     * @param array|string $key 属性键名或数组，数组时批量设置，字符串时单个设置
+     * @param mixed $value 属性值或数组值
+     * @return void
+     */
+    public static function put($key, $value = null): void
+    {
+        LaravelSession::put($key, $value);
+    }
+
+    /**
+     * 从会话中获取并删除属性
+     *
+     * @param string $key 属性键名
+     * @return mixed
+     */
+    public static function pull(string $key)
+    {
+        return LaravelSession::pull($key);
+    }
 }
