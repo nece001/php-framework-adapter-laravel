@@ -2,11 +2,34 @@
 
 namespace Nece\Framework\Adapter\Facade;
 
-use Illuminate\Support\Facades\Cache as FacadesCache;
+use Illuminate\Support\Facades\Cache as LaravelCache;
 use Nece\Framework\Adapter\Contract\Facade\Cache as ContractFacadeCache;
 
-class Cache extends FacadesCache implements ContractFacadeCache
+class Cache implements ContractFacadeCache
 {
+    /**
+     * 获取缓存
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function get(string $key, $default = null)
+    {
+        return LaravelCache::get($key, $default);
+    }
+
+    /**
+     * 判断缓存是否存在
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public static function has(string $key): bool
+    {
+        return LaravelCache::has($key);
+    }
+
     /**
      * 设置缓存
      *
@@ -17,7 +40,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
      */
     public static function set(string $key, mixed $value, $ttl = null): bool
     {
-        return static::put($key, $value, $ttl);
+        return LaravelCache::put($key, $value, $ttl);
     }
 
     /**
@@ -28,7 +51,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
      */
     public static function delete(string $key): bool
     {
-        return static::forget($key);
+        return LaravelCache::forget($key);
     }
 
     /**
@@ -38,7 +61,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
      */
     public static function clear(): bool
     {
-        return static::flush();
+        return LaravelCache::flush();
     }
 
     /**
@@ -50,7 +73,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
      */
     public static function getMultiple(iterable $keys, $default = null): iterable
     {
-        return static::many($keys);
+        return LaravelCache::many($keys);
     }
 
     /**
@@ -62,7 +85,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
      */
     public static function setMultiple(iterable $values, $ttl = null): bool
     {
-        return static::putMany($values, $ttl);
+        return LaravelCache::putMany($values, $ttl);
     }
 
     /**
@@ -74,7 +97,7 @@ class Cache extends FacadesCache implements ContractFacadeCache
     public static function deleteMultiple(iterable $keys): bool
     {
         foreach ($keys as $key) {
-            static::forget($key);
+            LaravelCache::forget($key);
         }
         return true;
     }

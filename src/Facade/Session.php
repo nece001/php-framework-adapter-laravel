@@ -39,4 +39,27 @@ class Session extends FacadesSession implements ContractFacadeSession
     {
         static::forget($key);
     }
+
+    /**
+     * 获取会话属性
+     *
+     * @param string $key 属性键名
+     * @param mixed $default 默认值
+     * @return mixed
+     */
+    public static function get(string $key, $default = null)
+    {
+        return static::get($key, $default);
+    }
+
+    /**
+     * 检查会话属性是否存在
+     *
+     * @param string $key 属性键名
+     * @return bool
+     */
+    public static function has(string $key): bool
+    {
+        return static::has($key);
+    }
 }

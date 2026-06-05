@@ -15,7 +15,7 @@ class Captcha implements ContractCaptcha
     public function image(): string
     {
         $captcha = app(MewsCaptcha::class);
-        return $captcha->create();
+        return $captcha->create()->getContent();
     }
 
     /**
