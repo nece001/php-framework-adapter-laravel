@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": ">=7.2",
+        "mews/captcha": "^3.4",
         "nece001/php-framework-adapter": "^2.0"
     }
 }
