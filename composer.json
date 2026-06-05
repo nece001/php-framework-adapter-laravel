@@ -17,12 +17,5 @@
     "require": {
         "php": ">=7.2",
         "nece001/php-framework-adapter": "^2.0"
-    },
-    "extra": {
-        "laravel":{
-            "providers": [
-                "Nece\\Framework\\Adapter\\LaravelPhpServiceProvider"
-            ]
-        }
     }
 }
