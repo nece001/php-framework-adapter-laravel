@@ -272,17 +272,13 @@ class Controller extends IlluminateController implements ContractController
     public function successPagedList(Paginator $page)
     {
         $data = [
-            'code' => 0,
-            'message' => 'success',
-            'data' => $page->all(),
-            'pagination' => [
-                'total' => $page->total(),
-                'per_page' => $page->pageSize(),
-                'current_page' => $page->currentPage(),
-                'last_page' => $page->lastPage(),
-            ],
+            'total' => $page->total(),
+            'page' => $page->currentPage(),
+            'page_size' => $page->pageSize(),
+            'pages' => $page->lastPage(),
+            'items' => $page->all(),
         ];
-        return $this->json($data);
+        return $this->success($data);
     }
 
     /**

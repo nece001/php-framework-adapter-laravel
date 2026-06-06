@@ -483,7 +483,7 @@ class Request implements ContractRequest
      */
     public function path(): string
     {
-        return $this->request->path();
+        return '/' . $this->request->path();
     }
 
     /**
