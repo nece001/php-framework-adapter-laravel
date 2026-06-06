@@ -274,10 +274,10 @@ class Controller extends IlluminateController implements ContractController
         $data = [
             'code' => 0,
             'message' => 'success',
-            'data' => $page->items(),
+            'data' => $page->all(),
             'pagination' => [
                 'total' => $page->total(),
-                'per_page' => $page->perPage(),
+                'per_page' => $page->pageSize(),
                 'current_page' => $page->currentPage(),
                 'last_page' => $page->lastPage(),
             ],
