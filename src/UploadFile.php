@@ -108,7 +108,11 @@ class UploadFile implements ContractUploadFile
      */
     public function move(string $destination): \SplFileInfo
     {
-        return $this->upload_file->move($destination);
+        $info = pathinfo($destination);
+        $path = $info['dirname'];
+        $filename = $info['basename'];
+
+        return $this->upload_file->move($path, $filename);
     }
 
     /**
