@@ -379,6 +379,10 @@ class Model implements DbAdapterModel, \JsonSerializable, \ArrayAccess
      */
     public function __call(string $name, array $arguments)
     {
-        return $this->model->$name(...$arguments);
+        if (method_exists($this->model, $name)) {
+            return $this->model->$name(...$arguments);
+        }
+
+        return $this->query()->$name(...$arguments);
     }
 }
