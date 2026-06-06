@@ -637,9 +637,11 @@ class Query implements DbAdapterQuery
     /**
      * @inheritDoc
      */
-    public function paginate(int $page = 1, int $page_size = 15, array $options = []): Paginator
+    public function paginate(int $page_size = 15, int $page = 1, array $options = []): Paginator
     {
-        $laravelPaginator = $this->query->paginate($page_size, ['*'], 'page', $page);
+        $page_name = $options['page_name'] ?? 'page';
+
+        $laravelPaginator = $this->query->paginate($page_size, ['*'], $page_name, $page);
         $total = $laravelPaginator->total();
         $currentPage = $laravelPaginator->currentPage();
         $items = [];
