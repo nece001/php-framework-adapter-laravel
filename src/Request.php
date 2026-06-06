@@ -4,6 +4,7 @@ namespace Nece\Framework\Adapter;
 
 use Nece\Framework\Adapter\Contract\Request as ContractRequest;
 use Nece\Framework\Adapter\Facade\Session;
+use Nece\Framework\Adapter\UploadFile;
 use Illuminate\Http\Request as IlluminateRequest;
 
 class Request implements ContractRequest
@@ -227,16 +228,17 @@ class Request implements ContractRequest
     public function file(string $name = '')
     {
         if (empty($name)) {
-            return $this->request->allFiles();
+            $files = $this->request->allFiles();
+            return UploadFile::instances($files);
         }
         $file = $this->request->file($name);
         if (!$file) {
             return [];
         }
         if (is_array($file)) {
-            return $file;
+            return UploadFile::instances($file);
         }
-        return [$file];
+        return [UploadFile::instance($file)];
     }
 
     /**
