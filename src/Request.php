@@ -108,10 +108,7 @@ class Request implements ContractRequest
      */
     public function input($name = '', $default = null, $filter = '')
     {
-        if ($name === false) {
-            return $this->request->input();
-        }
-        return $this->applyFilter($this->request->input($name, $default), $filter);
+        return $this->getValue($this->request->input(), $name, $default, $filter);
     }
 
     /**
