@@ -36,46 +36,6 @@ abstract class Command extends LaravelCommand implements ContractCommand
     private $optDefinitions = [];
 
     /**
-     * 参数是必需的
-     */
-    public const ARGUMENT_REQUIRED = 1;
-
-    /**
-     * 参数是可选的（默认行为）
-     */
-    public const ARGUMENT_OPTIONAL = 2;
-
-    /**
-     * 参数接受多个值
-     */
-    public const ARGUMENT_IS_ARRAY = 4;
-
-    /**
-     * 选项不接受值（默认行为）
-     */
-    public const OPTION_VALUE_NONE = 1;
-
-    /**
-     * 选项必须有值
-     */
-    public const OPTION_VALUE_REQUIRED = 2;
-
-    /**
-     * 选项的值是可选的
-     */
-    public const OPTION_VALUE_OPTIONAL = 4;
-
-    /**
-     * 选项接受多个值
-     */
-    public const OPTION_VALUE_IS_ARRAY = 8;
-
-    /**
-     * 选项允许传递否定变体
-     */
-    public const OPTION_VALUE_NEGATABLE = 16;
-
-    /**
      * 构造函数
      */
     public function __construct()
@@ -86,9 +46,6 @@ abstract class Command extends LaravelCommand implements ContractCommand
         // 生成 signature（包含命令名称）
         $signature = $this->generateSignature();
 
-        // 调用父构造函数（不传名称，使用 signature 中的名称）
-        parent::__construct();
-
         // 设置生成的 signature（在 configure() 之后）
         if (!empty($signature)) {
             $this->signature = $signature;
@@ -98,6 +55,9 @@ abstract class Command extends LaravelCommand implements ContractCommand
         if (!empty(static::$defaultDescription)) {
             $this->description = static::$defaultDescription;
         }
+
+        // 调用父构造函数（不传名称，使用 signature 中的名称）
+        parent::__construct();
     }
 
     /**
@@ -105,7 +65,7 @@ abstract class Command extends LaravelCommand implements ContractCommand
      *
      * @return void
      */
-    protected abstract function configure(): void;
+    protected function configure(): void {}
 
     /**
      * 生成命令签名
@@ -194,6 +154,133 @@ abstract class Command extends LaravelCommand implements ContractCommand
     }
 
     /**
+     * 获取命令行参数
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getArg($name)
+    {
+        return $this->argument($name);
+    }
+
+    /**
+     * 获取命令行选项
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getOpt($name)
+    {
+        return $this->option($name);
+    }
+
+    /**
+     * 询问用户
+     *
+     * @param string $question
+     * @param mixed $default
+     * @return mixed
+     */
+    public function showAsk($question, $default = null)
+    {
+        return $this->ask($question, $default);
+    }
+
+    /**
+     * 确认用户操作
+     *
+     * @param string $question
+     * @param bool $default
+     * @return bool
+     */
+    public function showConfirm($question, $default = false)
+    {
+        return $this->confirm($question, $default);
+    }
+
+    /**
+     * 选择用户操作
+     *
+     * @param string $question
+     * @param array $choices
+     * @param mixed $default
+     * @param int|null $attempts
+     * @param bool $multiple
+     * @return mixed
+     */
+    public function showChoice($question, array $choices, $default = null, $attempts = null, $multiple = false)
+    {
+        return $this->choice($question, $choices, $default, $attempts, $multiple);
+    }
+
+    /**
+     * 输出空行
+     *
+     * @param int $count
+     * @return void
+     */
+    public function showLine($count = 1)
+    {
+        $this->newLine($count);
+    }
+
+    /**
+     * 输出信息消息
+     *
+     * @param string $message
+     * @return void
+     */
+    public function showInfo($message)
+    {
+        $this->info($message);
+    }
+
+    /**
+     * 输出注释消息
+     *
+     * @param string $message
+     * @return void
+     */
+    public function showComment($message)
+    {
+        $this->comment($message);
+    }
+
+    /**
+     * 输出问题消息
+     *
+     * @param string $question
+     * @return void
+     */
+    public function showQuestion($question)
+    {
+        $this->question($question);
+    }
+
+    /**
+     * 输出警告消息
+     *
+     * @param string $message
+     * @return void
+     */
+    public function showWarn($message)
+    {
+        $this->warn($message);
+    }
+
+    /**
+     * 输出错误消息
+     *
+     * @param string $message
+     * @return void
+     */
+    public function showError($message)
+    {
+        $this->error($message);
+    }
+
+    /**
      * 添加命令行参数
      *
      * @param string $name 参数名称
@@ -237,16 +324,5 @@ abstract class Command extends LaravelCommand implements ContractCommand
             'suggestedValues' => $suggestedValues,
         ];
         return $this;
-    }
-
-    /**
-     * 输出问题消息
-     *
-     * @param string $question
-     * @return void
-     */
-    public function question(string $question): void
-    {
-        $this->output->writeln('<question>' . $question . '</question>');
     }
 }
