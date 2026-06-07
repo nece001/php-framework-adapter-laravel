@@ -51,9 +51,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取上传文件名
-     *
-     * @return string|null
+     * @inheritDoc
      */
     public function getUploadName(): ?string
     {
@@ -61,9 +59,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取上传文件的MIME类型
-     *
-     * @return string|null
+     * @inheritDoc
      */
     public function getUploadMimeType(): ?string
     {
@@ -71,9 +67,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取上传文件的扩展名
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getUploadExtension(): string
     {
@@ -81,9 +75,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取上传错误码
-     *
-     * @return int|null
+     * @inheritDoc
      */
     public function getUploadErrorCode(): ?int
     {
@@ -91,9 +83,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 检查上传是否有效
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isValid(): bool
     {
@@ -101,10 +91,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 移动文件到指定位置
-     *
-     * @param string $destination
-     * @return \SplFileInfo
+     * @inheritDoc
      */
     public function move(string $destination): \SplFileInfo
     {
@@ -116,9 +103,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件路径（不含文件名）
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getPath(): string
     {
@@ -126,9 +111,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件名
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getFilename(): string
     {
@@ -136,9 +119,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取完整路径
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getPathname(): string
     {
@@ -146,9 +127,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件扩展名
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getExtension(): string
     {
@@ -156,10 +135,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件基本名
-     *
-     * @param string|null $suffix
-     * @return string
+     * @inheritDoc
      */
     public function getBasename(?string $suffix = null): string
     {
@@ -167,9 +143,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否为文件
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isFile(): bool
     {
@@ -177,9 +151,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否为目录
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isDir(): bool
     {
@@ -187,9 +159,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否为符号链接
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isLink(): bool
     {
@@ -197,9 +167,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件大小（字节）
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getSize(): int|false
     {
@@ -207,9 +175,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件所有者
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getOwner(): int|false
     {
@@ -217,9 +183,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件所属组
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getGroup(): int|false
     {
@@ -227,9 +191,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取最后访问时间
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getATime(): int|false
     {
@@ -237,9 +199,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取最后修改时间
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getMTime(): int|false
     {
@@ -247,9 +207,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取创建时间
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getCTime(): int|false
     {
@@ -257,9 +215,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取文件权限
-     *
-     * @return int|false
+     * @inheritDoc
      */
     public function getPerms(): int|false
     {
@@ -267,9 +223,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否可读
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isReadable(): bool
     {
@@ -277,9 +231,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否可写
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isWritable(): bool
     {
@@ -287,9 +239,7 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 是否可执行
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isExecutable(): bool
     {
@@ -297,12 +247,18 @@ class UploadFile implements ContractUploadFile
     }
 
     /**
-     * 获取真实路径
-     *
-     * @return string|false
+     * @inheritDoc
      */
     public function getRealPath(): string|false
     {
         return $this->upload_file->getRealPath();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRealUploadFile(): UploadedFile
+    {
+        return $this->upload_file;
     }
 }
