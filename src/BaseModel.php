@@ -30,6 +30,13 @@ class BaseModel extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends = $this->append; // 兼容thinkphp的属性名
+    }
+
     public function __call($name, $arguments)
     {
         // 兼容thinkphp的属性方法
