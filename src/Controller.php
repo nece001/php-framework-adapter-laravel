@@ -292,6 +292,7 @@ class Controller extends IlluminateController implements ContractController
     {
         return $this->json([
             'code' => 0,
+            'status' => 'success',
             'message' => $message,
             'data' => $data,
         ]);
@@ -308,7 +309,8 @@ class Controller extends IlluminateController implements ContractController
     public function failure(string $message = 'failure', $code = '', $data = null)
     {
         return $this->json([
-            'code' => $code ?: -1,
+            'code' => $code,
+            'status' => 'failure',
             'message' => $message,
             'data' => $data,
         ]);
@@ -322,11 +324,7 @@ class Controller extends IlluminateController implements ContractController
      */
     public function exception(\Exception $e)
     {
-        return $this->json([
-            'code' => $e->getCode() ?: -1,
-            'message' => $e->getMessage(),
-            'data' => null,
-        ], 500);
+        return $this->failure($e->getMessage(), $e->getCode());
     }
 
     /**
