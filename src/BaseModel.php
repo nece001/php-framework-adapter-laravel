@@ -29,4 +29,47 @@ class BaseModel extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function __call($name, $arguments)
+    {
+        // 兼容thinkphp的属性方法
+        if ($this->isGetAttr($name) || $this->isSetAttr($name)) {
+            $name = substr($name, 0, -5);
+            return $this->$name(...$arguments);
+        }
+
+        return parent::__call($name, $arguments);
+    }
+
+    /**
+     * 判断是否获取属性方法
+     *
+     * @author nece001@163.com
+     * @create 2026-06-07 17:26:06
+     *
+     * @param string $name 方法名
+     * @return boolean
+     */
+    private function isGetAttr(string $name)
+    {
+        $patt = '/get(.*)Attribute/';
+
+        return preg_match($patt, $name);
+    }
+
+    /**
+     * 判断是否设置属性方法
+     *
+     * @author nece001@163.com
+     * @create 2026-06-07 17:26:06
+     *
+     * @param string $name 方法名
+     * @return boolean
+     */
+    private function isSetAttr(string $name)
+    {
+        $patt = '/set(.*)Attribute/';
+
+        return preg_match($patt, $name);
+    }
 }
