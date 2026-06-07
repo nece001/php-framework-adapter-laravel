@@ -42,16 +42,11 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
             $this->query->withCount($relation);
         } else {
             // 字符串形式，可能带字段和别名
-            if ($field) {
-                $relation = [$relation => function ($q) use ($field) {
-                    $q->selectRaw('COUNT(' . $field . ')');
-                }];
+            if ($name) {
+                // Laravel 8+ 支持自定义别名：withCount(['relation as alias'])
+                $relation = [$relation . ' as ' . $name];
             }
             $this->query->withCount($relation);
-            // 如果指定了别名，需要特殊处理
-            if ($name) {
-                // Laravel 的 withCount 不直接支持自定义别名，这里简化处理
-            }
         }
         return $this;
     }
@@ -61,12 +56,15 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
      */
     public function withSum($relation, string $field = null, string $name = null): DbAdapterModelRelationQuery
     {
-        if ($field) {
-            $relation = [$relation => function ($q) use ($field) {
-                $q->selectRaw('SUM(' . $field . ')');
-            }];
+        if (!$field) {
+            throw new \InvalidArgumentException('withSum requires a field parameter');
         }
-        $this->query->withSum($relation, $field ?: '*');
+        
+        if ($name) {
+            // Laravel 8+ 支持自定义别名
+            $relation = [$relation . ' as ' . $name];
+        }
+        $this->query->withSum($relation, $field);
         return $this;
     }
 
@@ -75,12 +73,14 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
      */
     public function withAvg($relation, string $field = null, string $name = null): DbAdapterModelRelationQuery
     {
-        if ($field) {
-            $relation = [$relation => function ($q) use ($field) {
-                $q->selectRaw('AVG(' . $field . ')');
-            }];
+        if (!$field) {
+            throw new \InvalidArgumentException('withAvg requires a field parameter');
         }
-        $this->query->withAvg($relation, $field ?: '*');
+        
+        if ($name) {
+            $relation = [$relation . ' as ' . $name];
+        }
+        $this->query->withAvg($relation, $field);
         return $this;
     }
 
@@ -89,12 +89,14 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
      */
     public function withMin($relation, string $field = null, string $name = null): DbAdapterModelRelationQuery
     {
-        if ($field) {
-            $relation = [$relation => function ($q) use ($field) {
-                $q->selectRaw('MIN(' . $field . ')');
-            }];
+        if (!$field) {
+            throw new \InvalidArgumentException('withMin requires a field parameter');
         }
-        $this->query->withMin($relation, $field ?: '*');
+        
+        if ($name) {
+            $relation = [$relation . ' as ' . $name];
+        }
+        $this->query->withMin($relation, $field);
         return $this;
     }
 
@@ -103,12 +105,14 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
      */
     public function withMax($relation, string $field = null, string $name = null): DbAdapterModelRelationQuery
     {
-        if ($field) {
-            $relation = [$relation => function ($q) use ($field) {
-                $q->selectRaw('MAX(' . $field . ')');
-            }];
+        if (!$field) {
+            throw new \InvalidArgumentException('withMax requires a field parameter');
         }
-        $this->query->withMax($relation, $field ?: '*');
+        
+        if ($name) {
+            $relation = [$relation . ' as ' . $name];
+        }
+        $this->query->withMax($relation, $field);
         return $this;
     }
 
@@ -117,10 +121,15 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
      */
     public function load($relation, $callback = null): DbAdapterModelRelationQuery
     {
-        if ($callback) {
-            $this->query->load($relation, $callback);
-        } else {
-            $this->query->load($relation);
+        // load 是模型实例方法，不能在查询构建器上调用
+        // 需要先执行查询获取模型
+        $model = $this->query->first();
+        if ($model) {
+            if ($callback) {
+                $model->load($relation, $callback);
+            } else {
+                $model->load($relation);
+            }
         }
         return $this;
     }
@@ -132,7 +141,9 @@ class ModelRelationQuery extends Query implements DbAdapterModelRelationQuery
     {
         // 调用模型的 scope 方法，Laravel 的 scope 方法名以 scope 开头
         $scopeMethod = 'scope' . ucfirst($scope);
-        $this->query->{$scopeMethod}(...$args);
+        if (method_exists($this->query, $scopeMethod)) {
+            $this->query->{$scopeMethod}(...$args);
+        }
         return $this;
     }
 }
