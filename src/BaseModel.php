@@ -34,7 +34,9 @@ class BaseModel extends Model
     {
         parent::__construct($attributes);
 
-        $this->appends = $this->append; // 兼容thinkphp的属性名
+        if (isset($this->append) && $this->append) {
+            $this->appends = $this->append; // 兼容thinkphp的属性名
+        }
     }
 
     public function __call($name, $arguments)
