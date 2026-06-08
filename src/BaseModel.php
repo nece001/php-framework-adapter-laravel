@@ -11,6 +11,35 @@ class BaseModel extends Model
     const UPDATED_AT = 'update_time';
     const DELETED_AT = 'delete_time';
 
+    protected $alias = '';
+
+    /**
+     * 设置模型别名
+     *
+     * @author nece001@163.com
+     * @create 2026-06-08 19:38:55
+     *
+     * @param string $alias
+     * @return void
+     */
+    public function setAlias(string $alias)
+    {
+        $this->alias = $alias;
+    }
+
+    /**
+     * 获取模型别名
+     *
+     * @author nece001@163.com
+     * @create 2026-06-08 19:39:00
+     *
+     * @return void
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
     /**
      * 获取与模型关联的表名（不转为复数形式）
      *

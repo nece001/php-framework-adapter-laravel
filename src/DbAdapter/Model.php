@@ -14,6 +14,8 @@ class Model implements DbAdapterModel, \JsonSerializable, \ArrayAccess
      */
     private BaseModel $model;
 
+    protected $alias = '';
+
     public function __construct(BaseModel $model)
     {
         $this->model = $model;
@@ -29,6 +31,24 @@ class Model implements DbAdapterModel, \JsonSerializable, \ArrayAccess
     public static function instance(string $model_name): DbAdapterModel
     {
         return new self(new $model_name());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setAlias(string $alias): DbAdapterModel
+    {
+        $this->alias = $alias;
+        $this->model->setAlias($alias);
+        return $this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 
     /**
@@ -233,7 +253,7 @@ class Model implements DbAdapterModel, \JsonSerializable, \ArrayAccess
     {
         // 使用 newQuery() 方法获取查询对象
         $query = $this->model->newQuery();
-        return new ModelRelationQuery($query);
+        return new ModelRelationQuery($query, $this);
     }
 
     /**

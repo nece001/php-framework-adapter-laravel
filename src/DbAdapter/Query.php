@@ -6,6 +6,8 @@ use Closure;
 use Nece\Framework\Adapter\Contract\DbAdapter\Query as DbAdapterQuery;
 use Nece\Framework\Adapter\DbAdapter\Paginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
+use Nece\Framework\Adapter\Contract\DbAdapter\Model as ModelInterface;
 
 class Query implements DbAdapterQuery
 {
@@ -16,9 +18,17 @@ class Query implements DbAdapterQuery
      */
     protected Builder $query;
 
-    public function __construct(Builder $query)
+    /**
+     * 关联模型
+     *
+     * @var Model
+     */
+    protected ModelInterface $model;
+
+    public function __construct(Builder $query, ModelInterface $model)
     {
         $this->query = $query;
+        $this->model = $model;
     }
 
     /**
@@ -45,7 +55,9 @@ class Query implements DbAdapterQuery
      */
     public function alias(string $alias): DbAdapterQuery
     {
-        $this->query->from($this->query->getModel()->getTable() . ' as ' . $alias);
+        $table = $this->query->getModel()->getTable();
+        $this->query->from($table, $alias);
+        $this->model->setAlias($alias);
         return $this;
     }
 
@@ -54,8 +66,7 @@ class Query implements DbAdapterQuery
      */
     public function getAlias(string $table = ''): string
     {
-        // Laravel Builder 没有直接获取别名的方法
-        return '';
+        return $this->model->getAlias();
     }
 
     /**
@@ -81,30 +92,6 @@ class Query implements DbAdapterQuery
     public function fieldRaw(string $field): DbAdapterQuery
     {
         $this->query->selectRaw($field);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withoutField(array $field): DbAdapterQuery
-    {
-        // Laravel 没有直接排除字段的方法，需要获取所有字段再排除
-        // 这里简化处理，实际使用中可能需要更复杂的实现
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function tableField(array $field, string $tableName, string $prefix = '', string $alias = ''): DbAdapterQuery
-    {
-        $columns = [];
-        $tableAlias = $alias ?: $tableName;
-        foreach ($field as $f) {
-            $columns[] = ($prefix ? $prefix . '.' : $tableAlias . '.') . $f;
-        }
-        $this->query->addSelect($columns);
         return $this;
     }
 
@@ -151,42 +138,135 @@ class Query implements DbAdapterQuery
     /**
      * @inheritDoc
      */
-    public function join(string $join, string $condition = null, string $type = 'INNER', array $bind = []): DbAdapterQuery
+    public function join(ModelInterface $model, string $condition = null, string $type = 'INNER', array $bind = []): DbAdapterQuery
     {
-        $this->query->join($join, $condition, $type);
         if ($bind) {
             $this->query->addBinding($bind, 'join');
         }
-        return $this;
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function leftJoin(string $join, string $condition = null, array $bind = []): DbAdapterQuery
-    {
-        $this->join($join, $condition, 'LEFT', $bind);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rightJoin(string $join, string $condition = null, array $bind = []): DbAdapterQuery
-    {
-        $this->join($join, $condition, 'RIGHT', $bind);
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function fullJoin(string $join, string $condition = null, array $bind = []): DbAdapterQuery
-    {
-        $this->query->crossJoin($join);
-        if ($condition) {
-            $this->query->whereRaw($condition);
+        $table = $model->getTable();
+        $alias = $model->getAlias();
+        if ($alias) {
+            $table = $table . ' AS ' . $alias;
         }
+
+        $this->query->join($table, function ($join) use ($condition) {
+            // 解析条件并构建 JOIN ON 子句
+            $this->parseJoinConditions($join, $condition);
+        }, $type);
+        return $this;
+    }
+
+    /**
+     * 解析 JOIN 条件字符串
+     *
+     * @param \Illuminate\Database\Query\JoinClause $join      JOIN 子句对象
+     * @param string                                 $condition 条件字符串
+     *
+     * @return void
+     */
+    private function parseJoinConditions($join, string $condition): void
+    {
+        // 定义支持的操作符（按长度排序，优先匹配长操作符）
+        $operators = [
+            '!=',
+            '<>',
+            '<=>',
+            '<=',
+            '>=',
+            '<',
+            '>',
+            '=',
+            'LIKE',
+            'NOT LIKE',
+            'IN',
+            'NOT IN',
+            'IS NULL',
+            'IS NOT NULL'
+        ];
+
+        // 定义逻辑操作符
+        $logicOperators = ['AND', 'OR'];
+
+        // 按逻辑操作符拆分条件
+        $parts = preg_split('/\s+(' . implode('|', $logicOperators) . ')\s+/i', $condition, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $currentLogic = 'AND';
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+
+            // 跳过空字符串
+            if (empty($part)) {
+                continue;
+            }
+
+            // 判断是否是逻辑操作符
+            $upperPart = strtoupper($part);
+            if (in_array($upperPart, $logicOperators)) {
+                $currentLogic = $upperPart;
+                continue;
+            }
+
+            // 查找操作符
+            $operator = null;
+            $left = null;
+            $right = null;
+
+            foreach ($operators as $op) {
+                $pattern = '/\s*' . preg_quote($op, '/') . '\s*/i';
+                $matches = preg_split($pattern, $part, 2);
+
+                if (count($matches) === 2) {
+                    $operator = $op;
+                    $left = trim($matches[0]);
+                    $right = trim($matches[1]);
+                    break;
+                }
+            }
+
+            // 如果找到操作符，构建 ON 条件
+            if ($operator && $left !== null) {
+                // 处理 IS NULL / IS NOT NULL 特殊情况
+                if (strtoupper($operator) === 'IS NULL') {
+                    if ($currentLogic === 'OR') {
+                        $join->orOn($left, 'IS', null);
+                    } else {
+                        $join->on($left, 'IS', null);
+                    }
+                } elseif (strtoupper($operator) === 'IS NOT NULL') {
+                    if ($currentLogic === 'OR') {
+                        $join->orOn($left, 'IS NOT', null);
+                    } else {
+                        $join->on($left, 'IS NOT', null);
+                    }
+                } else {
+                    // 处理其他操作符
+                    if ($currentLogic === 'OR') {
+                        $join->orOn($left, $operator, $right);
+                    } else {
+                        $join->on($left, $operator, $right);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function leftJoin(ModelInterface $model, string $condition = null, array $bind = []): DbAdapterQuery
+    {
+        $this->join($model, $condition, 'LEFT', $bind);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rightJoin(ModelInterface $model, string $condition = null, array $bind = []): DbAdapterQuery
+    {
+        $this->join($model, $condition, 'RIGHT', $bind);
         return $this;
     }
 
