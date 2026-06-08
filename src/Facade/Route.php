@@ -30,7 +30,7 @@ class Route implements RouteContract
                         $rounte->name($name);
                     }
                     if ($match) {
-                        $rounte->completeMatch();
+                        $rounte->fallback();
                     }
                 }
             }
