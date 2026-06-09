@@ -21,11 +21,11 @@ class Route implements RouteContract
                 foreach ($methods as $method) {
                     $path = $prefix . '/' . ltrim($method['path'], '/');
                     $action = $method['action'];
-                    $method = $method['method'] ?? 'get';
                     $name = $method['name'] ?? '';
                     $match = $method['match'] ?? false;
+                    $mtd = $method['method'] ?? 'get';
 
-                    $rounte = LaravelRoute::match($method, $path, [$controller_class, $action]);
+                    $rounte = LaravelRoute::match($mtd, $path, [$controller_class, $action]);
                     if ($name) {
                         $rounte->name($name);
                     }
@@ -39,6 +39,9 @@ class Route implements RouteContract
 
     public static function url(string $name, array $params = []): string
     {
-        return url($name, $params);
+        $url = route($name, $params);
+
+        // 把编码后的{}还原
+        return str_replace(['%7B', '%7D'], ['{', '}'], $url);
     }
 }
