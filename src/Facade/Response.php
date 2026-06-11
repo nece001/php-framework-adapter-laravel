@@ -108,6 +108,19 @@ class Response implements ResponseContract
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function buildData($code, $status, $message, $data = [])
+    {
+        return [
+            'code' => $code,
+            'status' => $status,
+            'message' => $message,
+            'data' => $data,
+        ];
+    }
+
+    /**
      * 数组转XML
      *
      * @param mixed $data
