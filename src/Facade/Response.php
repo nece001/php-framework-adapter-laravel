@@ -6,110 +6,64 @@ use Nece\Framework\Adapter\Contract\Facade\Response as ResponseContract;
 
 class Response implements ResponseContract
 {
-    /**
-     * 基础响应
-     *
-     * @param string $body 响应体
-     * @param int $status 状态码
-     * @param array $headers 请求头
-     * @return mixed
-     */
     public static function response(string $body = '', int $status = 200, array $headers = [])
     {
         return response($body, $status, $headers);
     }
 
-    /**
-     * JSON 响应
-     *
-     * @param mixed $data 数据
-     * @param int $options 选项
-     * @return mixed
-     */
-    public static function json($data, int $options = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
+    public static function json($data, int $status = 200, array $headers = [], array $options = [])
     {
-        return response()->json($data, 200, [], $options);
+        $defaultOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR;
+        $mergedOptions = empty($options) ? $defaultOptions : $options;
+        return response()->json($data, $status, $headers, $mergedOptions);
     }
 
-    /**
-     * XML 响应
-     *
-     * @param mixed $xml XML数据
-     * @return mixed
-     */
-    public static function xml($xml)
+    public static function xml($xml, int $status = 200, array $headers = [], array $options = [])
     {
-        $headers = ['Content-Type' => 'text/xml; charset=utf-8'];
+        $defaultHeaders = ['Content-Type' => 'text/xml; charset=utf-8'];
+        $mergedHeaders = array_merge($defaultHeaders, $headers);
+        
         if (is_array($xml) || is_object($xml)) {
-            $xml = static::arrayToXml($xml);
+            $root = isset($options['root']) ? $options['root'] : 'response';
+            $xml = static::arrayToXml($xml, $root);
         }
-        return response($xml, 200, $headers);
+        return response($xml, $status, $mergedHeaders);
     }
 
-    /**
-     * JSONP 响应
-     *
-     * @param mixed $data 数据
-     * @param string $callback_name 回调函数名
-     * @return mixed
-     */
-    public static function jsonp($data, string $callback_name = 'callback')
+    public static function jsonp($data, int $status = 200, array $headers = [], array $options = [])
     {
-        return response()->jsonp($callback_name, $data);
+        $callbackName = isset($options['callback']) ? $options['callback'] : 'callback';
+        return response()->jsonp($callbackName, $data, $status, $headers);
     }
 
-    /**
-     * 重定向响应
-     *
-     * @param string $location 重定向地址
-     * @param int $status 状态码
-     * @param array $headers 请求头
-     * @return mixed
-     */
-    public static function redirect(string $location, int $status = 302, array $headers = [])
+    public static function redirect(string $location, int $status = 302)
     {
-        return redirect($location, $status, $headers);
+        return redirect($location, $status);
     }
 
-    /**
-     * 视图响应
-     *
-     * @param mixed $template 模板
-     * @param array $vars 变量
-     * @param string|null $app 应用
-     * @param string|null $plugin 插件
-     * @return mixed
-     */
-    public static function view(mixed $template = null, array $vars = [], ?string $app = null, ?string $plugin = null)
+    public static function view(mixed $template = null, array $vars = [], int $status = 200)
     {
-        return view($template, $vars);
+        return response()->view($template, $vars, $status);
     }
 
-    /**
-     * 文件下载响应
-     *
-     * @param string $file_path 文件路径
-     * @param string|null $filename 文件名
-     * @return mixed
-     */
-    public static function download(string $file_path, ?string $filename = null)
+    public static function download(string $filename, string $name = '', bool $content = false, int $expire = 180)
     {
-        return response()->download($file_path, $filename);
+        if ($content) {
+            $response = response($filename, 200, [
+                'Content-Type' => 'application/octet-stream',
+                'Content-Disposition' => 'attachment; filename="' . ($name ?: 'download') . '"',
+                'Cache-Control' => 'max-age=' . $expire,
+            ]);
+            return $response;
+        }
+        return response()->download($filename, $name ?: null);
     }
 
-    /**
-     * 404 未找到
-     *
-     * @return mixed
-     */
     public static function notFound()
     {
         abort(404);
     }
 
-    /**
-     * @inheritDoc
-     */
     public static function buildData($code, $status, $message, $data = [])
     {
         return [
@@ -120,13 +74,6 @@ class Response implements ResponseContract
         ];
     }
 
-    /**
-     * 数组转XML
-     *
-     * @param mixed $data
-     * @param string $root
-     * @return string
-     */
     protected static function arrayToXml($data, $root = 'response')
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -136,12 +83,6 @@ class Response implements ResponseContract
         return $xml;
     }
 
-    /**
-     * 递归数组转XML
-     *
-     * @param mixed $data
-     * @return string
-     */
     protected static function arrayToXmlRecursive($data)
     {
         $xml = '';
